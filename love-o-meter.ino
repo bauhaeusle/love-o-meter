@@ -12,7 +12,7 @@
 #define TOUCH_PIN      0
 
 // How many NeoPixels are attached to the Arduino?
-#define NUMPIXELS      12
+#define NUMPIXELS      29
 // When we setup the NeoPixel library, we tell it how many pixels, and which pin to use to send signals.
 // Note that for older NeoPixel strips you might need to change the third parameter--see the strandtest
 // example for more information on possible values.
@@ -31,28 +31,42 @@ void setup() {
   digitalWrite(6,HIGH);
   pixels.begin(); // This initializes the NeoPixel library.
 }
-int val;
+long touch_input;
 float fhue;
 
+long getSaturation(int input) {
+  long saturation = map(input, 0, 1024, 0, 255);
+  if (saturation > 0) {
+    return saturation;
+  }
+  return 0;
+}
+
+int getPixelCount(int input) {
+  long count = map(input, 0, 1024, 0, NUMPIXELS);
+  if (count > 0) {
+    return count;
+  }
+  return 0;
+}
 
 void loop() {
 
-  NUMPIXELS
-
-  val = analogRead(TOUCH_PIN);
-  Serial.print("analog 0 is: ");
-  Serial.println(val);
-  fhue = map(val, 700, 1023, 0, 255);
+  touch_input = analogRead(TOUCH_PIN);
+  long sat = getSaturation(touch_input);
+  int pixel_count = getPixelCount(touch_input);
   
-  Serial.print("hue is: ");
-  Serial.println(hue%(255/NUMPIXELS));
-  if (fhue > 20.0) {
-    hue = (int) fhue;
-  } else {
-    hue = 0;
-  }
-  for (int i = 0; i < NUMPIXELS%(255/hue); i++) {
-    pixels.setPixelColor(i, pixels.Color(hue,0,0));
+  Serial.printf("touch_input is:   %i\n", touch_input);
+  Serial.printf("saturation is:    %i\n", sat);
+  Serial.printf("count is:         %i\n", pixel_count);
+  
+  for (int i = 0; i < NUMPIXELS; i++) {
+    if (i <= pixel_count) {
+      pixels.setPixelColor(i, pixels.Color(sat,0,0));  
+    } else {
+      pixels.setPixelColor(i, pixels.Color(0,0,0));  
+    }
+    
   }
   delay(100);
   pixels.show();
