@@ -52,7 +52,7 @@ int getPixelCount(int input) {
 
 void loop() {
 
-  touch_input = analogRead(TOUCH_PIN);
+  touch_input = 1023 - analogRead(TOUCH_PIN);
   long sat = getSaturation(touch_input);
   int pixel_count = getPixelCount(touch_input);
   
